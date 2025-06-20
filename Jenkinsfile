@@ -21,13 +21,23 @@ pipeline {
         }
         
         stage('Test running') {
-            steps {
-                bat 'dotnet test --logger "trx;LogFileName=results.trx" --results-directory TestResults'
-                bat 'copy TestResults\\results.trx TestResults\\results.xml'
-            }
-            post {
-                always {
-                    archiveArtifacts artifacts: 'TestResults/results.xml', allowEmptyArchive: true
+            parallel {
+                stage('Run tests Project1') {
+                    steps {
+                        bat 'dotnet test TestProject1 --no-build --verbosity normal'
+                    }
+                }
+
+                stage('Run tests Project2') {
+                    steps {
+                        bat 'dotnet test TestProject2 --no-build --verbosity normal'
+                    }
+                }
+
+                stage('Run tests Project3') {
+                    steps {
+                        bat 'dotnet test TestProject3 --no-build --verbosity normal'
+                    }
                 }
             }
         }
